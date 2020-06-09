@@ -1,4 +1,4 @@
-# Sopes1_proyecto1_web
+# Sopes1 proyecto1 aplicacion web
 
 ##Aplicacion Web
 ---
