@@ -10,3 +10,7 @@ Además permite mostrará la información básica de los procesos que se ejecuta
 ---
 - Go
 - HTML/CSS
+
+### Librerias utilizadas
+Para la lectura de los procesos se utilizo:
+- https://godoc.org/github.com/shirou/gopsutil/process

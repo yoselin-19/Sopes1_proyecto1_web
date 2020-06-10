@@ -56,7 +56,22 @@
 
   <div class="container">
     <h1>Principal</h1>
+    <ul id="messages"></ul>
   </div>
+
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+    const socket = io("http://localhost:3000/socket.io/");
+    var s2 = io("/chat");
+    s2.on('reply', function(msg){
+      $('#messages').append($('<li>').text(msg));
+    });
+
+    s2.emit('msg', "hola", function(data){
+          $('#messages').append($('<li>').text('ACK CALLBACK: ' + data));
+    });
+  </script>
 
 </body>
 
