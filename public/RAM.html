@@ -20,6 +20,83 @@
     integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
     crossorigin="anonymous"></script>
 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    var intervalo = 1; //Tiempo en segundos de cada cuanto se van a refrescar los datos
+    var contador = 0;
+    var arreglo = [
+      ['Tiempo', 'Porcentaje'],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ];
+
+    google.charts.load("current", {
+      callback: function () {
+        drawChart()
+        setInterval(drawChart, intervalo * 1000);
+
+        function drawChart() {
+          $.ajax({
+            url: "/RAM",
+            type: "get",
+            success: function (json) {
+
+              //Actualizo en el HTML
+              var obj = JSON.parse(json);
+              var cantidad = obj['Porcentaje_Consumo_Ram'];
+
+              //Actualizo en el HTML
+              $("#Total").html("Total de RAM del servidor: " + obj['Total_Ram_Servidor'] + ' MB');
+              $("#Consumida").html("Total de RAM consumida: " + obj['Total_Ram_Consumida'] + ' MB');
+              $("#Porcentaje").html("Porcentaje de consumo de RAM: " + cantidad + ' MB');
+
+              var options = {
+                title: 'Consumo de memoria',
+                hAxis: { title: 'Tiempo (s)', titleTextStyle: { color: '#333' } },
+                vAxis: { title: 'RAM (%)', minValue: 0 },
+                chartArea: { "backgroundColor": "#27C9BF" }
+              };
+
+              contador += intervalo;
+
+              var nuevo_arreglo = [
+                ['Tiempo', 'Porcentaje'], //[0]
+                [arreglo[2][0], arreglo[2][1]],     //[1]
+                [arreglo[3][0], arreglo[3][1]],     //[2]
+                [arreglo[4][0], arreglo[4][1]],     //[3]
+                [arreglo[5][0], arreglo[5][1]],     //[4]
+                [arreglo[6][0], arreglo[6][1]],     //[1]
+                [arreglo[7][0], arreglo[7][1]],     //[2]
+                [arreglo[8][0], arreglo[8][1]],     //[3]
+                [arreglo[9][0], arreglo[9][1]],     //[4]
+                [arreglo[10][0], arreglo[10][1]],   //[4]
+                [contador, cantidad]      //[5]
+              ];
+
+              arreglo = nuevo_arreglo;
+
+              var data = google.visualization.arrayToDataTable(arreglo);
+              var chart = new google.visualization.AreaChart(document.getElementById("grafica"));
+              chart.draw(data, options);
+            }
+          });
+        }
+
+      },
+      packages: ["corechart"]
+    });
+
+  </script>
+
 </head>
 
 <body>
@@ -45,7 +122,7 @@
 
           <!-- Monitor de RAM -->
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px; color: white;" href="#">Monitor de RAM</a>
+            <a class="nav-link" style="font-size: 20px; color: white;" href="RAM.html">Monitor de RAM</a>
           </li>
         </ul>
       </div>
@@ -55,8 +132,17 @@
   </header>
 
   <div class="container">
-    <h1>RAM</h1>
-    <h1>RAM</h1>
+    <div class="row">
+      <div class="col-sm-8">
+        <h1>RAM</h1>
+        <h3 id="Total" style="color: white;"></h3>
+        <h3 id="Consumida" style="color: white;"></h3>
+        <h3 id="Porcentaje" style="color: white;"></h3>
+      </div>
+    </div>
+    <div class="row">
+      <div id="grafica" style="width: 800px; height: 375px" class="col-sm-8"></div>
+    </div>
   </div>
 
 </body>
