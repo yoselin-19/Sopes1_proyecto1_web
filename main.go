@@ -2,77 +2,53 @@ package main
 
 //Importaciones
 import (
- "net/http"
- "fmt"
+	"net/http"
+	"fmt"
 
- //Para lectura de los archivos
- "./librerias"
- "strings"
+	//Para lectura de los archivos
+	"./librerias"
+	"strings"
 
- //Para la lectura de los procesos
- "github.com/shirou/gopsutil/cpu"
+	//Para la lectura de los procesos
+	"github.com/shirou/gopsutil/cpu"
 
- //Para usar json
- "encoding/json"
+	//Para usar json
+	"encoding/json"
 
- //Para conversiones
- "strconv"
- "math"
-
- //Para el socket
-//  socketio "github.com/googollee/go-socket.io"
+	//Para conversiones
+	"strconv"
+	"math"
 )
 
-//Variables a utilizar
-var numeroRun, numeroSleep, numeroStop, numeroZombie int32
-// var arr_process []Proceso
 //=======================================================================
 
 //Funcion Principal
 func main() {
- //Rutas
-//  http.HandleFunc("/", lista_procesos)
- http.HandleFunc("/RAM", memoria_proceso)
- http.HandleFunc("/CPU", cpu_proceso)
+	//Rutas de API-REST
+	http.HandleFunc("/PROCESS", lista_procesos)
+	http.HandleFunc("/RAM", memoria_proceso)
+	http.HandleFunc("/CPU", cpu_proceso)
 
-//  server, err := socketio.NewServer(nil)
-//  if err != nil {
-//    fmt.Println(err)
-//  }
+	// Para los archivos staticos (css,js)
+	fs := http.FileServer(http.Dir("./public"))
+	http.Handle("/",fs)
+   
+	//Rutas para cliente
+	http.HandleFunc("/Principal.html", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w,r, "./public/Principal.html")
+	})
 
-// server.OnConnect("/", func(s socketio.Conn) error {
-//   s.SetContext("")
-//   fmt.Println("connected:", s.ID())
-//   return nil
-// })
-// server.OnEvent("/", "notice", func(s socketio.Conn, msg string) {
-//   fmt.Println("notice:", msg)
-//   s.Emit("reply", "have "+msg)
-// })
+	http.HandleFunc("/CPU.html", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w,r, "./public/CPU.html")
+	})
 
-// server.OnEvent("/chat", "msg", func(s socketio.Conn, msg string) string {
-//   s.SetContext(msg)
-//   return "recv " + msg
-// })
+	http.HandleFunc("/RAM.html", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w,r, "./public/RAM.html")
+	})
 
-// server.OnError("/", func(s socketio.Conn, e error) {
-//   fmt.Println("meet error:", e)
-// })
-// server.OnDisconnect("/", func(s socketio.Conn, reason string) {
-//   fmt.Println("closed", reason)
-// })
-
- fs := http.FileServer(http.Dir("./public"))
- http.Handle("/",fs)
-
-//  http.Handle("/socket.io/", server)
-
-//  go server.Serve()
-//  defer server.Close()
-
- //Servidor levantado
- http.ListenAndServe(":3000", nil)
- fmt.Println("Servidor levantado en el puerto: 3000")
+	//Servidor levantado
+	fmt.Println("Servidor levantado en el puerto: 3000")
+	http.ListenAndServe(":3000", nil)
 }
 
 func memoria_proceso(w http.ResponseWriter, r *http.Request){
@@ -106,7 +82,6 @@ func memoria_proceso(w http.ResponseWriter, r *http.Request){
 	}
 
 	JSON_Data,_ := json.Marshal(info_ram)
-	fmt.Println(string(JSON_Data))
 	w.Write(JSON_Data)
 }
 
@@ -119,10 +94,67 @@ func cpu_proceso(w http.ResponseWriter, r *http.Request) {
   }
 
   JSON_Data , _ := json.Marshal(info_cpu)
-  fmt.Println(string(JSON_Data))
   w.Write(JSON_Data)
 }
 
+func lista_procesos(w http.ResponseWriter, r *http.Request){
+	var arr_process []PROCESS
+
+	//Obteniendo lista de directorios
+	lista_directorios := librerias.Get_directorios("/proc")
+
+	//Recorriendo cada directorio
+	for _,dir := range lista_directorios {
+		informacion := librerias.Lectura_archivo(dir,2)
+
+		//Obteniendo cada atributo
+		Pid_ := strings.Split(informacion[0],":")[1]
+		Pid_ = strings.Replace(Pid_, "\t", "", -1)
+		Nombre_ := strings.Split(informacion[1], ":")[1]
+		Nombre_ = strings.Replace(Nombre_, "\t", "", -1)
+		Usuario_ := strings.Split(informacion[2], ":")[1]
+		Usuario_ = strings.Replace(Usuario_, "\t", " ", -1)
+		Estado_ := strings.Split(informacion[3], ":")[1]
+		Estado_ = strings.Replace(Estado_, " ", "", -1)
+		Porcentaje_ := ""
+
+		if informacion[4] != "" {
+			Porcentaje_ = strings.Split(informacion[4],":")[1]
+			Porcentaje_ = strings.Replace(Porcentaje_, "\t", "", -1)
+			Porcentaje_ = strings.Replace(Porcentaje_, " ", "", -1)
+		} else {
+			Porcentaje_ = "---"
+		}
+
+		info_process := PROCESS {
+			PID: Pid_,
+			Nombre: Nombre_,
+			Usuario: Usuario_,
+			Estado: librerias.GetStatus(Estado_),
+			PorcentajeRAM: Porcentaje_,
+			// Procesos_hijos *process.Process
+		}
+
+		arr_process = append(arr_process, info_process)
+	}
+
+	//Agregando informacion general
+	info_general := Info_general{
+		Procesos_en_ejecucion: librerias.NumeroRun,
+		Procesos_suspendidos: librerias.NumeroSleep,
+		Procesos_detenidos: librerias.NumeroStop,
+		Procesos_zombie: librerias.NumeroZombie,
+		Total_procesos: len(arr_process),
+		List_Procesos: arr_process,
+	}
+
+	JSON_Data , _ := json.Marshal(info_general)
+	w.Write(JSON_Data)
+}
+
+//=======================================================================
+
+//Estructuras a utilizar
 type RAM struct {
 	Total_Ram_Servidor int
 	Total_Ram_Consumida int
@@ -131,4 +163,22 @@ type RAM struct {
 
 type CPU struct {
   Porcentaje float64
+}
+
+type PROCESS struct {
+	PID string
+	Nombre string
+	Usuario string
+	Estado string
+	PorcentajeRAM string
+	// Procesos_hijos *process.Process
+}
+
+type Info_general struct {
+	Procesos_en_ejecucion int
+	Procesos_suspendidos int
+	Procesos_detenidos int
+	Procesos_zombie int
+	Total_procesos int
+	List_Procesos []PROCESS
 }
