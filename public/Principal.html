@@ -2,7 +2,7 @@
 
 <head>
   <title>Principal</title>
-  <link rel="stylesheet" type="text/css" href="./estilo.css">
+  <link href="/public/estilo.css" type="text/css" rel="stylesheet"/>
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,44 +23,50 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
   <script type="text/javascript">
-    $.ajax({
-      url: "/PROCESS",
-      type: "get",
-      success: function (json) {
-        //Actualizo en el HTML
-        var obj = JSON.parse(json);
-        $("#Ejecucion").html("Procesos en ejecución: " + obj['Procesos_en_ejecucion']);
-        $("#Suspendido").html("Procesos suspendidos: " + obj['Procesos_suspendidos']);
-        $("#Detenido").html("Procesos detenidos: " + obj['Procesos_detenidos']);
-        $("#Zombie").html("Procesos Zombie: " + obj['Procesos_zombie']);
-        $("#Total").html("Total de procesos: " + obj['Total_procesos']);
+    var intervalo = 1; //Tiempo en segundos de cada cuanto se van a refrescar los datos
+    update()
+    setInterval(update, intervalo * 1000)
+    function update() {
+      $.ajax({
+        url: "/PROCESS",
+        type: "get",
+        success: function (json) {
+          //Actualizo en el HTML
+          var obj = JSON.parse(json);
+          $("#Ejecucion").html("Procesos en ejecución: " + obj['Procesos_en_ejecucion']);
+          $("#Suspendido").html("Procesos suspendidos: " + obj['Procesos_suspendidos']);
+          $("#Detenido").html("Procesos detenidos: " + obj['Procesos_detenidos']);
+          $("#Zombie").html("Procesos Zombie: " + obj['Procesos_zombie']);
+          $("#Total").html("Total de procesos: " + obj['Total_procesos']);
 
-        var cadena = "<tr>"
-          + "<th>#</th>"
-          + "<th>PID</th>"
-          + "<th>Nombre</th>"
-          + "<th>Usuario</th>"
-          + "<th>Estado</th>"
-          + "<th>RAM</th>"
-          + "<th>Kill</th>"
-        "</tr>";
-
-        var arreglo_procesos = obj['List_Procesos'];
-
-        for (var i = 0; i < arreglo_procesos.length; i++) {
-          cadena += "<tr>"
-            + "<td>" + (i + 1) + "</td>"
-            + "<td>" + arreglo_procesos[i].PID + "</td>"
-            + "<td>" + arreglo_procesos[i].Nombre + "</td>"
-            + "<td>" + arreglo_procesos[i].Usuario + "</td>"
-            + "<td>" + arreglo_procesos[i].Estado + "</td>"
-            + "<td>" + arreglo_procesos[i].PorcentajeRAM + "</td>"
-            + "<td> <a href=\"/kill/" + arreglo_procesos[i].PID + "\" > Eliminar </a></td>"
+          var cadena = "<tr>"
+            + "<th>#</th>"
+            + "<th>PID</th>"
+            + "<th>Nombre</th>"
+            + "<th>Usuario</th>"
+            + "<th>Estado</th>"
+            + "<th>RAM</th>"
+            + "<th>Kill</th>"
           "</tr>";
+
+          var arreglo_procesos = obj['List_Procesos'];
+
+          for (var i = 0; i < arreglo_procesos.length; i++) {
+            cadena += "<tr>"
+              + "<td>" + (i + 1) + "</td>"
+              + "<td>" + arreglo_procesos[i].PID + "</td>"
+              + "<td>" + arreglo_procesos[i].Nombre + "</td>"
+              + "<td>" + arreglo_procesos[i].Usuario + "</td>"
+              + "<td>" + arreglo_procesos[i].Estado + "</td>"
+              + "<td>" + arreglo_procesos[i].PorcentajeRAM + "</td>"
+              + "<td> <a href=\"/kill/" + arreglo_procesos[i].PID + "\" class= \"btn btn-danger\"> Eliminar </a></td>"
+            "</tr>";
+          }
+          $("#tabla").html(cadena);
         }
-        $("#tabla").html(cadena);
-      }
-    });
+      });
+
+    }
 
   </script>
 

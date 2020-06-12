@@ -18,37 +18,42 @@ import (
 	//Para conversiones
 	"strconv"
 	"math"
+
+	//Para hacer el api rest
+	"github.com/gorilla/mux"
 )
 
 //=======================================================================
 
 //Funcion Principal
 func main() {
-	//Rutas de API-REST
-	http.HandleFunc("/PROCESS", lista_procesos)
-	http.HandleFunc("/RAM", memoria_proceso)
-	http.HandleFunc("/CPU", cpu_proceso)
-
+	router := mux.NewRouter().StrictSlash(true)
 	// Para los archivos staticos (css,js)
-	fs := http.FileServer(http.Dir("./public"))
-	http.Handle("/",fs)
+	router.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("./public"))))
+
+	//Rutas de API-REST
+	router.HandleFunc("/PROCESS", lista_procesos)
+	router.HandleFunc("/RAM", memoria_proceso)
+	router.HandleFunc("/CPU", cpu_proceso)
    
 	//Rutas para cliente
-	http.HandleFunc("/Principal.html", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/Principal.html", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w,r, "./public/Principal.html")
 	})
 
-	http.HandleFunc("/CPU.html", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/CPU.html", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w,r, "./public/CPU.html")
 	})
 
-	http.HandleFunc("/RAM.html", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/RAM.html", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w,r, "./public/RAM.html")
 	})
 
+	router.HandleFunc("/kill/{id}", kill_proceso)
+
 	//Servidor levantado
 	fmt.Println("Servidor levantado en el puerto: 3000")
-	http.ListenAndServe(":3000", nil)
+	http.ListenAndServe(":3000", router)
 }
 
 func memoria_proceso(w http.ResponseWriter, r *http.Request){
@@ -110,16 +115,24 @@ func lista_procesos(w http.ResponseWriter, r *http.Request){
 		//Obteniendo cada atributo
 		Pid_ := strings.Split(informacion[0],":")[1]
 		Pid_ = strings.Replace(Pid_, "\t", "", -1)
+
 		Nombre_ := strings.Split(informacion[1], ":")[1]
 		Nombre_ = strings.Replace(Nombre_, "\t", "", -1)
+
 		Usuario_ := strings.Split(informacion[2], ":")[1]
 		Usuario_ = strings.Replace(Usuario_, "\t", " ", -1)
+		Usuario_ = strings.Split(Usuario_, " ")[1]  //En la posicion 0 hay un espacio en blanco " "
+
 		Estado_ := strings.Split(informacion[3], ":")[1]
 		Estado_ = strings.Replace(Estado_, " ", "", -1)
+
+		Ppid_ := strings.Split(informacion[4],":")[1]
+		Ppid_ = strings.Replace(Ppid_, "\t", "", -1)
+
 		Porcentaje_ := ""
 
-		if informacion[4] != "" {
-			Porcentaje_ = strings.Split(informacion[4],":")[1]
+		if informacion[5] != "" {
+			Porcentaje_ = strings.Split(informacion[5],":")[1]
 			Porcentaje_ = strings.Replace(Porcentaje_, "\t", "", -1)
 			Porcentaje_ = strings.Replace(Porcentaje_, " ", "", -1)
 		} else {
@@ -129,10 +142,10 @@ func lista_procesos(w http.ResponseWriter, r *http.Request){
 		info_process := PROCESS {
 			PID: Pid_,
 			Nombre: Nombre_,
-			Usuario: Usuario_,
+			Usuario: librerias.GetNombreUsuario(Usuario_),
 			Estado: librerias.GetStatus(Estado_),
 			PorcentajeRAM: Porcentaje_,
-			// Procesos_hijos *process.Process
+			Proceso_padre: Ppid_,
 		}
 
 		arr_process = append(arr_process, info_process)
@@ -152,6 +165,11 @@ func lista_procesos(w http.ResponseWriter, r *http.Request){
 	w.Write(JSON_Data)
 }
 
+func kill_proceso(w http.ResponseWriter, r *http.Request){
+	key := mux.Vars(r)["id"]
+	librerias.MatarProceso(key)
+	http.Redirect(w,r,"/public/Principal.html", http.StatusFound)
+}
 //=======================================================================
 
 //Estructuras a utilizar
@@ -171,7 +189,7 @@ type PROCESS struct {
 	Usuario string
 	Estado string
 	PorcentajeRAM string
-	// Procesos_hijos *process.Process
+	Proceso_padre string
 }
 
 type Info_general struct {

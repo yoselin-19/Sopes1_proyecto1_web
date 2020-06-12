@@ -4,17 +4,20 @@ import (
 	"os"
 	"bufio"
 	"io/ioutil"
-	"fmt"
+	// "fmt"
 
 	//Para conversiones
 	"strconv"
 	"strings"
+
+	//Para ejecutar comandos de consola
+	"os/exec"
 )
 
 //Variables a utilizar
 var NumeroRun, NumeroSleep, NumeroStop, NumeroZombie int
 
-func Lectura_archivo(ruta string, tipo int) [5]string {
+func Lectura_archivo(ruta string, tipo int) [6]string {
 	archivo, error := os.Open(ruta)
 	defer func(){
 		archivo.Close()
@@ -27,7 +30,7 @@ func Lectura_archivo(ruta string, tipo int) [5]string {
    
 	scanner := bufio.NewScanner(archivo)
 	var i int
-	var texto2 [5]string
+	var texto2 [6]string
 	//Itera cada linea
 	for scanner.Scan() {
 		if tipo == 1 && i ==2 {
@@ -47,8 +50,10 @@ func Lectura_archivo(ruta string, tipo int) [5]string {
 				texto2[2] = linea
 			} else if nombre_aux[0] == "State" {
 				texto2[3] = linea
-			} else if nombre_aux[0] == "VmSize" {
+			} else if nombre_aux[0] == "PPid" {
 				texto2[4] = linea
+			} else if nombre_aux[0] == "VmSize" {
+				texto2[5] = linea
 			}
 		}
 	}
@@ -58,7 +63,7 @@ func Lectura_archivo(ruta string, tipo int) [5]string {
 func Get_directorios(ruta string) []string {
 	files, err := ioutil.ReadDir(ruta)
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 
 	var texto []string
@@ -101,5 +106,23 @@ func GetStatus(caracter string) string{
 		return "Lock"
 	} else {
 		return "Error status"
+	}
+}
+
+func GetNombreUsuario(uid string) string {
+	var usuario string
+	cmd,error := exec.Command("grep", "x:"+uid, "/etc/passwd").Output()
+	if error != nil {
+		usuario = "---"
+		return usuario
+	}
+	usuario = strings.Split(string(cmd), ":")[0]
+	return usuario
+}
+
+func MatarProceso(key string)  {
+	_,error := exec.Command("kill", "-15", key).Output()
+	if error != nil {
+		panic(error)
 	}
 }

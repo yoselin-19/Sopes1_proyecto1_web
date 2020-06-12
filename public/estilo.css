@@ -18,3 +18,7 @@ h1 {
 th, td {
   color: yellow;
 }
+
+th {
+  background-color: darkolivegreen;
+}
