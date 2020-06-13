@@ -126,3 +126,53 @@ func MatarProceso(key string)  {
 		panic(error)
 	}
 }
+
+func Insertar(raiz *Arbol, valor Arbol){
+	if len(raiz.Hijos) == 0 {
+		if raiz.Pid == valor.Ppid {
+			raiz.Hijos = append(raiz.Hijos, valor)
+			// fmt.Println(raiz.Hijos)
+		}
+	} else {
+		if raiz.Pid == valor.Ppid {
+			raiz.Hijos = append(raiz.Hijos, valor)
+		} else {
+			for i := 0; i < len(raiz.Hijos); i++ {
+				Insertar(&raiz.Hijos[i], valor)
+				// fmt.Println(raiz.Hijos[i])
+			}
+		}
+	}
+}
+
+func GetTextoArbol(raiz Arbol) string {
+	var texto string
+	texto = texto + "<ul>\n"
+	if len(raiz.Hijos) == 0 {
+		texto = texto + "<li>Pid:" + strconv.Itoa(raiz.Pid) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nombre:" + raiz.Nombre + "</li>\n"
+	} else {
+		for _,nodo := range raiz.Hijos {
+			if len(nodo.Hijos) == 0 {
+				texto = texto + "<li>Pid:" + strconv.Itoa(nodo.Pid) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nombre:" + nodo.Nombre + "</li>\n"
+			} else {
+				texto = texto + "<li>Pid:" + strconv.Itoa(nodo.Pid) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nombre:" + nodo.Nombre + "\n"
+				for _, val := range nodo.Hijos {
+					texto = texto + GetTextoArbol(val)
+				}
+				texto = texto + "</li>\n"
+			}
+		}
+	}
+	texto = texto + "</ul>\n"
+	return texto
+}
+
+//=======================================================================
+
+//Estructuras a utilizar
+type Arbol struct {
+	Pid int
+	Nombre string
+	Ppid int
+	Hijos []Arbol
+}

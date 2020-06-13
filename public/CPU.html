@@ -54,7 +54,7 @@
               //Actualizo en el HTML
               var obj = JSON.parse(json);
               var cantidad = obj['Porcentaje'];
-              $("#porcentaje").html("Porcentaje Utilizado: " + cantidad);
+              $("#porcentaje").html("Porcentaje Utilizado: " + cantidad + " %");
 
 
               var options = {
@@ -118,6 +118,11 @@
           <!-- Monitor de RAM -->
           <li class="nav-item">
             <a class="nav-link" style="font-size: 20px; color: white;" href="RAM.html">Monitor de RAM</a>
+          </li>
+
+          <!-- Arbol de Procesos -->
+          <li class="nav-item">
+            <a class="nav-link" style="font-size: 20px; color: white;" href="Arbol.html">Arbol</a>
           </li>
         </ul>
       </div>

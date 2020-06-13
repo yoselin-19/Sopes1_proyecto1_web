@@ -14,10 +14,12 @@ import (
 
 	//Para usar json
 	"encoding/json"
+	// "io"
 
 	//Para conversiones
 	"strconv"
 	"math"
+	"sort"
 
 	//Para hacer el api rest
 	"github.com/gorilla/mux"
@@ -35,8 +37,10 @@ func main() {
 	router.HandleFunc("/PROCESS", lista_procesos)
 	router.HandleFunc("/RAM", memoria_proceso)
 	router.HandleFunc("/CPU", cpu_proceso)
+	router.HandleFunc("/kill/{id}", kill_proceso)
+	router.HandleFunc("/Arbol", arbol_procesos)
    
-	//Rutas para cliente
+	//Rutas para cliente -Si ya tiene en la ruta .html ignora si send a un procedimiento y redirige a la pagina.html-
 	router.HandleFunc("/Principal.html", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w,r, "./public/Principal.html")
 	})
@@ -49,7 +53,9 @@ func main() {
 		http.ServeFile(w,r, "./public/RAM.html")
 	})
 
-	router.HandleFunc("/kill/{id}", kill_proceso)
+	router.HandleFunc("/Arbol.html", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w,r, "./public/Arbol.html")
+	})
 
 	//Servidor levantado
 	fmt.Println("Servidor levantado en el puerto: 3000")
@@ -170,6 +176,57 @@ func kill_proceso(w http.ResponseWriter, r *http.Request){
 	librerias.MatarProceso(key)
 	http.Redirect(w,r,"/public/Principal.html", http.StatusFound)
 }
+
+func arbol_procesos(w http.ResponseWriter, r *http.Request){
+	//Obteniendo lista de directorios
+	lista_directorios := librerias.Get_directorios("/proc")
+
+	//Variables para crear el arreglo de Arbol de procesos
+	var raiz librerias.Arbol
+	var arreglo []librerias.Arbol
+
+	//Recorriendo cada directorio
+	for _,dir := range lista_directorios {
+		informacion := librerias.Lectura_archivo(dir,2)
+
+		//Obteniendo cada atributo
+		Pid_ := strings.Split(informacion[0],":")[1]
+		PidNum,_ := strconv.Atoi(strings.Replace(Pid_, "\t", "", -1))
+
+		Nombre_ := strings.Split(informacion[1], ":")[1]
+		Nombre_ = strings.Replace(Nombre_, "\t", "", -1)
+
+		Ppid_ := strings.Split(informacion[4],":")[1]
+		PpidNum, _ := strconv.Atoi(strings.Replace(Ppid_, "\t", "", -1))
+
+		raiz = librerias.Arbol {
+			Pid: PidNum,
+			Nombre: Nombre_,
+			Ppid: PpidNum,
+			Hijos: nil,
+		}
+
+		arreglo = append(arreglo, raiz)
+	}
+
+	// Sort by age, keeping original order or equal elements.
+	sort.SliceStable(arreglo, func(i, j int) bool {
+		return arreglo[i].Ppid < arreglo[j].Ppid
+	})
+
+	//Construir texto de arbol
+	var nuevoB librerias.Arbol
+	for _, item := range arreglo{
+		librerias.Insertar(&nuevoB, item)
+	}
+
+	TextoArbol := librerias.GetTextoArbol(nuevoB)
+	info_tree := Tree{Arbol: TextoArbol}
+
+	JSON_Data , _ := json.Marshal(info_tree)
+	w.Write(JSON_Data)
+}
+
 //=======================================================================
 
 //Estructuras a utilizar
@@ -199,4 +256,8 @@ type Info_general struct {
 	Procesos_zombie int
 	Total_procesos int
 	List_Procesos []PROCESS
+}
+
+type Tree struct {
+	Arbol string
 }

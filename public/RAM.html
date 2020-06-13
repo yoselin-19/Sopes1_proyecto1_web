@@ -57,7 +57,7 @@
               //Actualizo en el HTML
               $("#Total").html("Total de RAM del servidor: " + obj['Total_Ram_Servidor'] + ' MB');
               $("#Consumida").html("Total de RAM consumida: " + obj['Total_Ram_Consumida'] + ' MB');
-              $("#Porcentaje").html("Porcentaje de consumo de RAM: " + cantidad + ' MB');
+              $("#Porcentaje").html("Porcentaje de consumo de RAM: " + cantidad + ' %');
 
               var options = {
                 title: 'Consumo de memoria',
@@ -123,6 +123,11 @@
           <!-- Monitor de RAM -->
           <li class="nav-item">
             <a class="nav-link" style="font-size: 20px; color: white;" href="RAM.html">Monitor de RAM</a>
+          </li>
+
+          <!-- Arbol de Procesos -->
+          <li class="nav-item">
+            <a class="nav-link" style="font-size: 20px; color: white;" href="Arbol.html">Arbol</a>
           </li>
         </ul>
       </div>

@@ -1,8 +1,8 @@
 <html>
 
 <head>
-  <title>Principal</title>
-  <link href="/public/estilo.css" type="text/css" rel="stylesheet"/>
+  <title>Arbol</title>
+  <link href="/public/estilo.css" type="text/css" rel="stylesheet" />
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,51 +25,19 @@
   <script type="text/javascript">
     var intervalo = 1; //Tiempo en segundos de cada cuanto se van a refrescar los datos
     update()
-    setInterval(update, intervalo * 1000)
-    function update() {
+    // setInterval(update, intervalo * 1000)
+    function update(){
       $.ajax({
-        url: "/PROCESS",
+        url: "/Arbol",
         type: "get",
         success: function (json) {
           //Actualizo en el HTML
           var obj = JSON.parse(json);
-          $("#Ejecucion").html("Procesos en ejecución: " + obj['Procesos_en_ejecucion']);
-          $("#Suspendido").html("Procesos suspendidos: " + obj['Procesos_suspendidos']);
-          $("#Detenido").html("Procesos detenidos: " + obj['Procesos_detenidos']);
-          $("#Zombie").html("Procesos Zombie: " + obj['Procesos_zombie']);
-          $("#Total").html("Total de procesos: " + obj['Total_procesos']);
-
-          var cadena = "<tr>"
-            + "<th>#</th>"
-            + "<th>PID</th>"
-            + "<th>Nombre</th>"
-            + "<th>Usuario</th>"
-            + "<th>Estado</th>"
-            + "<th>RAM</th>"
-            + "<th>Kill</th>"
-          "</tr>";
-
-          var arreglo_procesos = obj['List_Procesos'];
-
-          for (var i = 0; i < arreglo_procesos.length; i++) {
-            cadena += "<tr>"
-              + "<td>" + (i + 1) + "</td>"
-              + "<td>" + arreglo_procesos[i].PID + "</td>"
-              + "<td>" + arreglo_procesos[i].Nombre + "</td>"
-              + "<td>" + arreglo_procesos[i].Usuario + "</td>"
-              + "<td>" + arreglo_procesos[i].Estado + "</td>"
-              + "<td>" + arreglo_procesos[i].PorcentajeRAM + "</td>"
-              + "<td> <a href=\"/kill/" + arreglo_procesos[i].PID + "\" class= \"btn btn-danger\"> Eliminar </a></td>"
-            "</tr>";
-          }
-          $("#tabla").html(cadena);
+          $("#arbol").html(obj['Arbol']);
         }
       });
-
     }
-
   </script>
-
 </head>
 
 <body>
@@ -110,19 +78,8 @@
   </header>
 
   <div class="container">
-    <div class="row">
-      <div class="col-sm-8">
-        <h1>PROCESS</h1>
-        <h3 id="Ejecucion" style="color: white;"></h3>
-        <h3 id="Suspendido" style="color: white;"></h3>
-        <h3 id="Detenido" style="color: white;"></h3>
-        <h3 id="Zombie" style="color: white;"></h3>
-        <h3 id="Total" style="color: white;"></h3>
-      </div>
-    </div>
-    <div class="row">
-      <table id="tabla" class="table"></table>
-    </div>
+    <h3>Lista de procesos padres-hijos</h3>
+    <div id="arbol"></div>
   </div>
 
 </body>

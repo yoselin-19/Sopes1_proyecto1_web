@@ -22,3 +22,7 @@ th, td {
 th {
   background-color: darkolivegreen;
 }
+
+#arbol ul, li {
+  color: chartreuse;
+}
