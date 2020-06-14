@@ -135,22 +135,12 @@ func lista_procesos(w http.ResponseWriter, r *http.Request){
 		Ppid_ := strings.Split(informacion[4],":")[1]
 		Ppid_ = strings.Replace(Ppid_, "\t", "", -1)
 
-		Porcentaje_ := ""
-
-		if informacion[5] != "" {
-			Porcentaje_ = strings.Split(informacion[5],":")[1]
-			Porcentaje_ = strings.Replace(Porcentaje_, "\t", "", -1)
-			Porcentaje_ = strings.Replace(Porcentaje_, " ", "", -1)
-		} else {
-			Porcentaje_ = "---"
-		}
-
 		info_process := PROCESS {
 			PID: Pid_,
 			Nombre: Nombre_,
 			Usuario: librerias.GetNombreUsuario(Usuario_),
 			Estado: librerias.GetStatus(Estado_),
-			PorcentajeRAM: Porcentaje_,
+			PorcentajeRAM: librerias.GetPorcentajeRAM(Pid_),
 			Proceso_padre: Ppid_,
 		}
 

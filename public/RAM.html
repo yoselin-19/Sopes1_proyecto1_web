@@ -108,27 +108,24 @@
         <ul class="navbar-nav">
           <!-- Principal -->
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px; color: white;" href="Principal.html">Principal</a>
-          </li>
-
-          <li></li>
-
-          <!-- Monitor de CPU -->
-          <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px; color: white;" href="CPU.html">Monitor de CPU</a>
-          </li>
-
-          <li></li>
-
-          <!-- Monitor de RAM -->
-          <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px; color: white;" href="RAM.html">Monitor de RAM</a>
+            <a class="nav-link btn btn-success" style="font-size: 20px; color: white;" href="Principal.html">Principal</a>
           </li>
 
           <!-- Arbol de Procesos -->
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px; color: white;" href="Arbol.html">Arbol</a>
+            <a class="nav-link btn btn-info" style="font-size: 20px; color: white;" href="Arbol.html">Arbol</a>
           </li>
+
+          <!-- Monitor de CPU -->
+          <li class="nav-item">
+            <a class="nav-link btn btn-warning" style="font-size: 20px; color: white;" href="CPU.html">Monitor de CPU</a>
+          </li>
+
+          <!-- Monitor de RAM -->
+          <li class="nav-item">
+            <a class="nav-link btn btn-primary" style="font-size: 20px; color: white;" href="RAM.html">Monitor de RAM</a>
+          </li>
+
         </ul>
       </div>
 
@@ -137,16 +134,15 @@
   </header>
 
   <div class="container">
-    <div class="row">
-      <div class="col-sm-8">
-        <h1>RAM</h1>
-        <h3 id="Total" style="color: white;"></h3>
-        <h3 id="Consumida" style="color: white;"></h3>
-        <h3 id="Porcentaje" style="color: white;"></h3>
-      </div>
+    <div>
+      <h1>RAM</h1>
+      <h3 id="Total" style="color: white;"></h3>
+      <h3 id="Consumida" style="color: white;"></h3>
+      <h3 id="Porcentaje" style="color: white;"></h3>
     </div>
-    <div class="row">
-      <div id="grafica" style="width: 800px; height: 375px" class="col-sm-8"></div>
+    <br>
+    <div style="text-align: center">
+      <div id="grafica" style="width: 800px; height: 375px;"></div>
     </div>
   </div>
 

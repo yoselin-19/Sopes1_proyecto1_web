@@ -3,11 +3,12 @@ body {
 }
 
 .color_base{
-	background-color: #B7950B;
+	background-color: chocolate;
 }
 
 h1 {
   color: white;
+  text-align: center;
 }
 
 .container{
@@ -15,7 +16,11 @@ h1 {
   color: white;
 }
 
-th, td {
+th {
+  color: white;
+}
+
+td {
   color: yellow;
 }
 
@@ -25,4 +30,9 @@ th {
 
 #arbol ul, li {
   color: chartreuse;
+}
+
+#grafica {
+  display: block; 
+  margin: 0 auto;
 }

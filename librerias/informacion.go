@@ -4,7 +4,7 @@ import (
 	"os"
 	"bufio"
 	"io/ioutil"
-	// "fmt"
+	"fmt"
 
 	//Para conversiones
 	"strconv"
@@ -17,7 +17,7 @@ import (
 //Variables a utilizar
 var NumeroRun, NumeroSleep, NumeroStop, NumeroZombie int
 
-func Lectura_archivo(ruta string, tipo int) [6]string {
+func Lectura_archivo(ruta string, tipo int) [5]string {
 	archivo, error := os.Open(ruta)
 	defer func(){
 		archivo.Close()
@@ -30,7 +30,7 @@ func Lectura_archivo(ruta string, tipo int) [6]string {
    
 	scanner := bufio.NewScanner(archivo)
 	var i int
-	var texto2 [6]string
+	var texto2 [5]string
 	//Itera cada linea
 	for scanner.Scan() {
 		if tipo == 1 && i ==2 {
@@ -52,9 +52,7 @@ func Lectura_archivo(ruta string, tipo int) [6]string {
 				texto2[3] = linea
 			} else if nombre_aux[0] == "PPid" {
 				texto2[4] = linea
-			} else if nombre_aux[0] == "VmSize" {
-				texto2[5] = linea
-			}
+			} 
 		}
 	}
 	return texto2
@@ -165,6 +163,24 @@ func GetTextoArbol(raiz Arbol) string {
 	}
 	texto = texto + "</ul>\n"
 	return texto
+}
+
+func GetPorcentajeRAM(uid string) string {
+	var porcentaje string
+	// comando := "{if($2 == " + uid + ") print $2, $4}"
+	// cmd, error := exec.Command("ps", "aux", "|", "awk", comando).Output()
+	cmd, error := exec.Command("ps", "-O", "%mem", "-p", uid).Output()
+	if error != nil {
+		fmt.Println(error)
+		porcentaje = "---"
+		return porcentaje
+	}
+
+	aux := strings.Split(string(cmd), "\n")[1]
+	aux = strings.Trim(aux, " ")
+	
+	porcentaje = strings.Split(aux, " ")[2]
+	return porcentaje
 }
 
 //=======================================================================

@@ -2,7 +2,7 @@
 
 <head>
   <title>Principal</title>
-  <link href="/public/estilo.css" type="text/css" rel="stylesheet"/>
+  <link href="/public/estilo.css" type="text/css" rel="stylesheet" />
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,7 +25,7 @@
   <script type="text/javascript">
     var intervalo = 1; //Tiempo en segundos de cada cuanto se van a refrescar los datos
     update()
-    setInterval(update, intervalo * 1000)
+    setInterval(update, intervalo * 1500)
     function update() {
       $.ajax({
         url: "/PROCESS",
@@ -45,7 +45,7 @@
             + "<th>Nombre</th>"
             + "<th>Usuario</th>"
             + "<th>Estado</th>"
-            + "<th>RAM</th>"
+            + "<th>%RAM</th>"
             + "<th>Kill</th>"
           "</tr>";
 
@@ -81,27 +81,24 @@
         <ul class="navbar-nav">
           <!-- Principal -->
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px; color: white;" href="Principal.html">Principal</a>
-          </li>
-
-          <li style="background-color: white;"> </li>
-
-          <!-- Monitor de CPU -->
-          <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px; color: white;" href="CPU.html">Monitor de CPU</a>
-          </li>
-
-          <li style="background-color: white;"> </li>
-
-          <!-- Monitor de RAM -->
-          <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px; color: white;" href="RAM.html">Monitor de RAM</a>
+            <a class="nav-link btn btn-success" style="font-size: 20px; color: white;" href="Principal.html">Principal</a>
           </li>
 
           <!-- Arbol de Procesos -->
           <li class="nav-item">
-            <a class="nav-link" style="font-size: 20px; color: white;" href="Arbol.html">Arbol</a>
+            <a class="nav-link btn btn-info" style="font-size: 20px; color: white;" href="Arbol.html">Arbol</a>
           </li>
+
+          <!-- Monitor de CPU -->
+          <li class="nav-item">
+            <a class="nav-link btn btn-warning" style="font-size: 20px; color: white;" href="CPU.html">Monitor de CPU</a>
+          </li>
+
+          <!-- Monitor de RAM -->
+          <li class="nav-item">
+            <a class="nav-link btn btn-primary" style="font-size: 20px; color: white;" href="RAM.html">Monitor de RAM</a>
+          </li>
+
         </ul>
       </div>
 
@@ -110,16 +107,15 @@
   </header>
 
   <div class="container">
-    <div class="row">
-      <div class="col-sm-8">
+    <div>
         <h1>PROCESS</h1>
         <h3 id="Ejecucion" style="color: white;"></h3>
         <h3 id="Suspendido" style="color: white;"></h3>
         <h3 id="Detenido" style="color: white;"></h3>
         <h3 id="Zombie" style="color: white;"></h3>
         <h3 id="Total" style="color: white;"></h3>
-      </div>
     </div>
+    <br>
     <div class="row">
       <table id="tabla" class="table"></table>
     </div>
