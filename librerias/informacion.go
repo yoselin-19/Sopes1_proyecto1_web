@@ -171,7 +171,6 @@ func GetPorcentajeRAM(uid string) string {
 	// cmd, error := exec.Command("ps", "aux", "|", "awk", comando).Output()
 	cmd, error := exec.Command("ps", "-O", "%mem", "-p", uid).Output()
 	if error != nil {
-		fmt.Println(error)
 		porcentaje = "---"
 		return porcentaje
 	}
