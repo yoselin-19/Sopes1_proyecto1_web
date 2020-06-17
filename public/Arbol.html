@@ -25,7 +25,7 @@
   <script type="text/javascript">
     var intervalo = 1; //Tiempo en segundos de cada cuanto se van a refrescar los datos
     update()
-    // setInterval(update, intervalo * 1000)
+    setInterval(update, intervalo * 1000)
     function update() {
       $.ajax({
         url: "/Arbol",

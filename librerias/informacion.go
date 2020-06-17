@@ -4,7 +4,7 @@ import (
 	"os"
 	"bufio"
 	"io/ioutil"
-	"fmt"
+	//"fmt"
 
 	//Para conversiones
 	"strconv"
@@ -19,6 +19,8 @@ var NumeroRun, NumeroSleep, NumeroStop, NumeroZombie int
 
 func Lectura_archivo(ruta string, tipo int) [5]string {
 	archivo, error := os.Open(ruta)
+	//TODO hacer lo que falta
+	//BUG mejorar algo
 	defer func(){
 		archivo.Close()
 		recover()
